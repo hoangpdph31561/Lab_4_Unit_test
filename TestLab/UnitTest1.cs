@@ -8,7 +8,7 @@ namespace TestLab
         [SetUp]
         public void Setup()
         {
-
+            itemManager = new();
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace TestLab
         [Test]
         public void AddItem_ItemAlreadyExists_ThrowsArgumentException()
         {
-            var item = new Item(100, "Quang");
+            var item = new Item(1, "Quang");
             itemManager.AddItem(item);
             Assert.Throws<ArgumentException>(() => itemManager.AddItem(item));
         }
@@ -84,12 +84,12 @@ namespace TestLab
         [Test]
         public void UpdateItem_NameIsNull_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(100, null));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(2222, null));
         }
         [Test]
         public void UpdateItem_NameIsEmpty_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(100, ""));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(4444, ""));
         }
         [Test]
         public void UpdateItem_NameIsLongerThan50Characters_ThrowsArgumentException()
@@ -99,12 +99,12 @@ namespace TestLab
         [Test]
         public void UpdateItem_NameContainsSpecialCharacters_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(100, "Quang@"));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(2222, "Quang@"));
         }
         [Test]
         public void UpdateItem_NameContainsOnlySpaces_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(100, "    "));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(3333, "    "));
         }
         [Test]
         public void UpdateItem_NameIsTrimmed_UpdatesItem()
@@ -115,17 +115,17 @@ namespace TestLab
         [Test]
         public void UpdateItem_IdNotFound_ThrowsNullReferenceException()
         {
-            Assert.Throws<NullReferenceException>(() => itemManager.UpdateItem(100, "Quang"));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(1001, "Quang"));
         }
         [Test]
         public void UpdateItem_IdNegative_ThrowsNullReferenceException()
         {
-            Assert.Throws<NullReferenceException>(() => itemManager.UpdateItem(-1, "Quang"));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(-1, "Quang"));
         }
         [Test]
         public void UpdateItem_IdZero_ThrowsNullReferenceException()
         {
-            Assert.Throws<NullReferenceException>(() => itemManager.UpdateItem(0, "Quang"));
+            Assert.Throws<ArgumentException>(() => itemManager.UpdateItem(0, "Quang"));
         }
         [Test]
         public void DeleteItem_WhenCalled_DeletesItem()
@@ -148,6 +148,39 @@ namespace TestLab
         {
             Assert.Throws<NullReferenceException>(() => itemManager.DeleteItem(0));
         }
-
+        [Test]
+        public void DeleteItem_IdIsMaxNotExists_ThrowsNullReferenceException()
+        {
+            Assert.Throws<NullReferenceException>(() => itemManager.DeleteItem(int.MaxValue));
+        }
+        [Test]
+        public void DeleteItem_IdIsMinNotExists_ThrowsNullReferenceException()
+        {
+            Assert.Throws<NullReferenceException>(() => itemManager.DeleteItem(int.MinValue));
+        }
+        [Test]
+        public void DeleteItem_IdIsMaxExists_DeletesItem()
+        {
+            itemManager.DeleteItem(4444);
+            Assert.IsFalse(itemManager.items.Any(x => x.Id == 4444));
+        }
+        [Test]
+        public void DeleteItem_IdIsMinExists_DeletesItem()
+        {
+            itemManager.DeleteItem(1);
+            Assert.IsFalse(itemManager.items.Any(x => x.Id == 1));
+        }
+        [Test]
+        public void DeleteItem_IdIsMaxExists_CountDecreases()
+        {
+            itemManager.DeleteItem(4444);
+            Assert.AreEqual(5, itemManager.items.Count);
+        }
+        [Test]
+        public void DeleteItem_IdIsMinExists_CountDecreases()
+        {
+            itemManager.DeleteItem(1);
+            Assert.AreEqual(5, itemManager.items.Count);
+        }
     }
 }
